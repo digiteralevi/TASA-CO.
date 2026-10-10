@@ -94,7 +94,14 @@
   .stepper span{min-width:28px;text-align:center;font-weight:600}
 
 
-  /* Menu tabs + empty photo */
+  /* Menu sections + size picker */
+  .sub{font-family:var(--serif);font-weight:400;font-size:clamp(1.8rem,3.4vw,2.4rem);line-height:1.05;margin:46px 0 4px}
+  #drinksHead{margin-top:6px}
+  .subnote{color:var(--ink-soft);font-size:.96rem;margin-bottom:22px}
+  .sizes{display:inline-flex;align-self:flex-start;gap:4px;padding:3px;border-radius:999px;background:var(--mist);margin-top:6px}
+  .sizes button{padding:6px 15px;border-radius:999px;font-weight:500;font-size:.85rem;color:var(--ink-soft);transition:background .2s,color .2s}
+  .sizes button[aria-pressed="true"]{background:var(--roast);color:#fff}
+  /* Empty photo */
   .tabs{display:inline-flex;gap:6px;padding:5px;border-radius:999px;background:var(--paper);border:1px solid var(--line);margin-bottom:32px}
   .tabs button{padding:10px 24px;border-radius:999px;font-weight:500;color:var(--ink-soft);transition:background .2s,color .2s}
   .tabs button[aria-pressed="true"]{background:var(--roast);color:#fff}
@@ -196,11 +203,14 @@
         <h2>Our menu</h2>
         <p>Iced signature cups and a few things to eat with them. Add what you like, then send your order through Messenger.</p>
       </div>
-      <div class="tabs" id="tabs" role="group" aria-label="Menu category">
-        <button type="button" data-cat="drink" aria-pressed="true">Drinks</button>
-        <button type="button" data-cat="food" aria-pressed="false">Food</button>
+      <div id="menuWrap">
+        <h3 class="sub" id="drinksHead">Drinks</h3>
+        <p class="subnote">Every cup comes in 16 oz or 22 oz. Pick your size, then add it to your order.</p>
+        <div class="grid" id="gridDrink"></div>
+        <h3 class="sub" id="foodHead">Food</h3>
+        <p class="subnote">Something to eat with your cup.</p>
+        <div class="grid" id="gridFood"></div>
       </div>
-      <div class="grid" id="grid"></div>
     </div>
   </section>
 
@@ -208,13 +218,13 @@
     <div class="wrap">
       <div>
         <h2>Mix any 4 cups and save 10%</h2>
-        <p>Can't pick just one? Add any four drinks to your order and the discount applies automatically. Good for barkada, office, or a long weekend.</p>
+        <p>Can't pick just one? Add any four drinks, in any size, and the discount applies automatically. Good for barkada, office, or a long weekend.</p>
         <a class="btn-white" href="#flavors">Start mixing</a>
       </div>
       <div class="deal" aria-label="Bundle example">
-        <div><span>4 cups, regular price</span><b>&#8369;700</b></div>
-        <div><span>Bundle discount</span><b>&minus;&#8369;70</b></div>
-        <div><span>You pay</span><b>&#8369;630</b></div>
+        <div><span>4 cups (16 oz), regular price</span><b>&#8369;585</b></div>
+        <div><span>Bundle discount</span><b>&minus;&#8369;59</b></div>
+        <div><span>You pay</span><b>&#8369;526</b></div>
       </div>
     </div>
   </section>
@@ -251,6 +261,7 @@ const CREDIT_LINK    = "https://digiteralevisystem.vercel.app/";
 
 // Cloudinary image URLs. Walang URL = lalabas ang soft placeholder.
 const IMG = {
+  "story":            "https://res.cloudinary.com/dqo0bc4u/image/upload/v1791637834/Woman_holding_iced_coffee_cup_20261010200133_rwx4rc.jpg",
   "blueberry-matcha": "https://res.cloudinary.com/dqo0bc4u/image/upload/v1791633776/Woman_holding_iced_coffee_cup_20261010200241_jztcnx.jpg",
   "egg-coffee":       "https://res.cloudinary.com/dqo0bc4u/image/upload/v1791632595/Woman_holding_iced_coffee_cup_20261010194300_mhwszs.jpg",
   "ube-cheese":       "https://res.cloudinary.com/dqo0bc4u/image/upload/v1791632686/Woman_holding_iced_coffee_cup_20261010194417_hzq8mw.jpg",
@@ -264,11 +275,12 @@ const IMG = {
 /* ==================================== */
 
 const ITEMS = [
-  {cat:"drink", id:"blueberry-matcha", name:"Blueberry Matcha", price:185, tag:"New", desc:"Blueberry compote, fresh milk, and ceremonial matcha. Stir before you sip."},
-  {cat:"drink", id:"egg-coffee", name:"Vietnamese Egg Coffee", price:175, tag:"Best seller", desc:"Strong, concentrated coffee over ice, topped with sweet, custardy egg cream and a dusting of cocoa."},
-  {cat:"drink", id:"ube-cheese", name:"Ube Cheese Foam Latte", price:180, desc:"Purple ube milk with espresso and a salted cheese foam on top."},
-  {cat:"drink", id:"pandan-cold-brew", name:"Pandan Coconut Cold Brew", price:165, desc:"Slow cold brew, creamy coconut milk, and a cap of pandan cream."},
-  {cat:"drink", id:"salted-caramel", name:"Salted Caramel Spanish Latte", price:160, desc:"Sweet, creamy Spanish latte with caramel and a pinch of sea salt."},
+  /* sizes = price per size. Edit the numbers here. */
+  {cat:"drink", id:"blueberry-matcha", name:"Blueberry Matcha", sizes:{"16":155,"22":185}, tag:"New", desc:"Blueberry compote, fresh milk, and ceremonial matcha. Stir before you sip."},
+  {cat:"drink", id:"egg-coffee", name:"Vietnamese Egg Coffee", sizes:{"16":145,"22":175}, tag:"Best seller", desc:"Strong, concentrated coffee over ice, topped with sweet, custardy egg cream and a dusting of cocoa."},
+  {cat:"drink", id:"ube-cheese", name:"Ube Cheese Foam Latte", sizes:{"16":150,"22":180}, desc:"Purple ube milk with espresso and a salted cheese foam on top."},
+  {cat:"drink", id:"pandan-cold-brew", name:"Pandan Coconut Cold Brew", sizes:{"16":135,"22":165}, desc:"Slow cold brew, creamy coconut milk, and a cap of pandan cream."},
+  {cat:"drink", id:"salted-caramel", name:"Salted Caramel Spanish Latte", sizes:{"16":130,"22":160}, desc:"Sweet, creamy Spanish latte with caramel and a pinch of sea salt."},
   {cat:"food", id:"mushroom-pasta", name:"Creamy Mushroom Pasta", price:245, desc:"Al dente pasta in garlic cream sauce with sauteed mushrooms and parmesan."},
   {cat:"food", id:"tonkotsu-ramen", name:"Tonkotsu Ramen", price:285, tag:"Hearty", desc:"Slow-simmered pork broth, chashu, soft egg, and springy noodles."},
   {cat:"food", id:"butter-croissant", name:"Butter Croissant", price:150, desc:"Flaky and golden, made for dunking. Pairs well with an iced latte."},
@@ -278,8 +290,13 @@ const ITEMS = [
 const opt = (u,w) => u.replace("/upload/", "/upload/f_auto,q_auto,w_"+w+"/");
 const peso = n => "\u20B1" + n.toLocaleString("en-PH");
 const cart = {};
+const sel = {};                       /* chosen size per drink, default 16 oz */
+ITEMS.forEach(f => { if(f.sizes) sel[f.id] = "16"; });
+const keyOf   = f => f.sizes ? f.id + "|" + sel[f.id] : f.id;
+const priceOf = f => f.sizes ? f.sizes[sel[f.id]] : f.price;
 
-const grid = document.getElementById("grid");
+const menu = document.getElementById("menuWrap");
+const gridDrink = document.getElementById("gridDrink"), gridFood = document.getElementById("gridFood");
 ITEMS.forEach(f => {
   const el = document.createElement("article");
   el.className = "card";
@@ -288,42 +305,48 @@ ITEMS.forEach(f => {
     ? '<div class="ph">' + (f.tag ? '<span class="tag '+(f.tag==="New"?"new":"")+'">'+f.tag+'</span>' : '') +
       '<img src="'+opt(IMG[f.id],900)+'" alt="'+f.name+' at Tasa &amp; Co." loading="lazy"></div>'
     : '<div class="ph empty">' + (f.tag ? '<span class="tag">'+f.tag+'</span>' : '') + f.name + '</div>';
+  const sizes = f.sizes
+    ? '<div class="sizes" data-id="'+f.id+'" role="group" aria-label="Size">' +
+        Object.keys(f.sizes).map(s => '<button type="button" data-size="'+s+'" aria-pressed="'+(s===sel[f.id])+'">'+s+' oz</button>').join("") +
+      '</div>'
+    : '';
   el.innerHTML = photo +
-    '<div class="body"><h3>'+f.name+'</h3><p class="desc">'+f.desc+'</p>' +
-      '<div class="buy"><span class="price">'+peso(f.price)+'</span><span class="ctl" data-id="'+f.id+'"></span></div>' +
+    '<div class="body"><h3>'+f.name+'</h3><p class="desc">'+f.desc+'</p>' + sizes +
+      '<div class="buy"><span class="price" data-pid="'+f.id+'">'+peso(priceOf(f))+'</span><span class="ctl" data-id="'+f.id+'"></span></div>' +
     '</div>';
-  grid.appendChild(el);
+  (f.cat === "drink" ? gridDrink : gridFood).appendChild(el);
 });
 
-document.getElementById("storyImg").src = opt(IMG["egg-coffee"], 1000);
-
-/* Tabs */
-function showCat(cat){
-  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.cat === cat));
-  document.querySelectorAll(".card").forEach(c => c.hidden = c.dataset.cat !== cat);
-}
-document.getElementById("tabs").addEventListener("click", e => {
-  const b = e.target.closest("button[data-cat]");
-  if(b) showCat(b.dataset.cat);
-});
-showCat("drink");
+document.getElementById("storyImg").src = opt(IMG["story"], 1000);
 
 function renderControls(){
   document.querySelectorAll(".ctl").forEach(c => {
-    const id = c.dataset.id, q = cart[id] || 0;
+    const f = ITEMS.find(x => x.id === c.dataset.id), q = cart[keyOf(f)] || 0;
     c.innerHTML = q
       ? '<span class="stepper"><button type="button" data-a="dec" aria-label="Remove one">&minus;</button><span>'+q+'</span><button type="button" data-a="inc" aria-label="Add one">+</button></span>'
       : '<button class="add" type="button" data-a="inc">Add to order</button>';
   });
 }
 
-/* Totals: 10% off applies to drinks only, when there are 4 or more */
+/* Every line in the cart: item, size, qty, unit price */
+function cartLines(){
+  const out = [];
+  ITEMS.forEach(f => {
+    if(f.sizes){
+      Object.keys(f.sizes).forEach(s => { const q = cart[f.id+"|"+s] || 0; if(q) out.push({f, size:s, q, price:f.sizes[s]}); });
+    } else {
+      const q = cart[f.id] || 0; if(q) out.push({f, size:null, q, price:f.price});
+    }
+  });
+  return out;
+}
+
+/* Totals: 10% off applies to drinks only (any size), when there are 4 or more */
 function totals(){
   let qty = 0, sub = 0, drinks = 0, drinkSub = 0;
-  ITEMS.forEach(f => {
-    const q = cart[f.id] || 0;
-    qty += q; sub += q * f.price;
-    if(f.cat === "drink"){ drinks += q; drinkSub += q * f.price; }
+  cartLines().forEach(l => {
+    qty += l.q; sub += l.q * l.price;
+    if(l.f.cat === "drink"){ drinks += l.q; drinkSub += l.q * l.price; }
   });
   const discount = drinks >= 4 ? Math.round(drinkSub * 0.10) : 0;
   return {qty, sub, drinks, discount, total: sub - discount};
@@ -338,12 +361,21 @@ function renderBar(){
                : t.drinks > 0 ? "Add " + (4 - t.drinks) + " more drink" + (4 - t.drinks === 1 ? "" : "s") + " to save 10%" : "";
 }
 
-grid.addEventListener("click", e => {
+menu.addEventListener("click", e => {
+  const sz = e.target.closest("button[data-size]");
+  if(sz){
+    const box = sz.closest(".sizes"), id = box.dataset.id, f = ITEMS.find(x => x.id === id);
+    sel[id] = sz.dataset.size;
+    box.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b === sz));
+    menu.querySelector('[data-pid="'+id+'"]').textContent = peso(priceOf(f));
+    renderControls();
+    return;
+  }
   const b = e.target.closest("button[data-a]");
   if(!b) return;
-  const id = b.closest(".ctl").dataset.id;
-  cart[id] = Math.max(0, (cart[id] || 0) + (b.dataset.a === "inc" ? 1 : -1));
-  if(!cart[id]) delete cart[id];
+  const f = ITEMS.find(x => x.id === b.closest(".ctl").dataset.id), k = keyOf(f);
+  cart[k] = Math.max(0, (cart[k] || 0) + (b.dataset.a === "inc" ? 1 : -1));
+  if(!cart[k]) delete cart[k];
   renderControls(); renderBar();
 });
 
@@ -356,7 +388,7 @@ function toast(msg){
 document.getElementById("orderBtn").addEventListener("click", () => {
   const t = totals();
   if(!t.qty) return;
-  const lines = ITEMS.filter(f => cart[f.id]).map(f => cart[f.id] + "x " + f.name + " (" + peso(f.price * cart[f.id]) + ")");
+  const lines = cartLines().map(l => l.q + "x " + l.f.name + (l.size ? " " + l.size + " oz" : "") + " (" + peso(l.price * l.q) + ")");
   let text = "Hi Tasa & Co.! I'd like to order:\n" + lines.join("\n");
   if(t.discount) text += "\nBundle discount: -" + peso(t.discount);
   text += "\nTotal: " + peso(t.total);
